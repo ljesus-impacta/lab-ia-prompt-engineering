@@ -1,0 +1,49 @@
+name: AI Security Guardian
+
+on:
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '**.tf' # Só roda se mudar arquivos Terraform
+
+jobs:
+  analyze-code:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write # Necessário se quiser comentar no PR depois
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install Dependencies
+        run: |
+          pip install -r requirements.txt
+
+      # Aqui simulamos pegar o primeiro arquivo .tf modificado
+      # Em produção, você faria um loop sobre todos os arquivos alterados
+      - name: Run AI Analysis (OpenAI)
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          # Encontra o primeiro arquivo .tf (exemplo simplificado)
+          TARGET_FILE=$(find . -name "*.tf" | head -n 1)
+          
+          if [ -z "$TARGET_FILE" ]; then
+            echo "Nenhum arquivo Terraform encontrado."
+            exit 0
+          fi
+
+          echo "Analisando: $TARGET_FILE"
+          python scripts/scan_with_ai.py "$TARGET_FILE"
+
+      - name: Validate AI Verdict (Gatekeeper)
+        run: |
+          # Roda o script de validação que criamos anteriormente
+          python scripts/validate_pr.py
