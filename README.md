@@ -13,15 +13,18 @@
 
 ```plaintext
 .
-├── prompts/              # Seus arquivos .md com as versões dos prompts
+├── .github/
+│   └── workflows/
+│       └── iac-scan.yml      # O Workflow do GitHub
+├── prompts/                  # Seus arquivos .md com as versões dos prompts
 │   ├── v1-baseline.md
 │   ├── v2-structured.md
-│   └── v3-schema.md
-├── resultados/           # Os prints/logs dos testes
-│   ├── ...
-├── scripts/              # Os scripts python
-│   └── validate_pr.py
-├── llm_output.json       # Arquivo temporário gerado pela IA para teste (input do script)
+│   └── v3-schema.md          # O Prompt (usado pelo script Python)
+├── scripts/
+│   ├── scan_with_ai.py       # Conecta na OpenAI
+│   └── validate_pr.py        # Valida o JSON e bloqueia o PR
+├── requirements.txt          # Dependências (openai)
+├── llm_output_example.json           # Arquivo exemplo gerado pela IA para teste
 └── README.md
 ```
 
