@@ -2,8 +2,10 @@
 
 > Este projeto demonstra a evolução de técnicas de Prompt Engineering aplicadas a DevOps, criando um analisador automático de Pull Requests focado em Segurança e Infraestrutura como Código (IaC).
 
-**Contexto:** DevOps Engineering  
-**Autor:** Luciano Souza de Jesus
++ **Contexto:** DevOps Engineering  
++ **Autor:** Luciano Souza de Jesus
++ **MBA:** Arquitetura de Soluções em Cloud Computing
++ **Universidade:** Impacta
 
 ---
 
