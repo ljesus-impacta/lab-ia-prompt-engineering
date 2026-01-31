@@ -4,7 +4,7 @@
 
 + **Contexto:** DevOps Engineering  
 + **Autor:** Luciano Souza de Jesus
-+ **MBA:** Arquitetura de Soluções em Cloud Computing
++ **MBA:** CLC14 Cloud Computing & DevOps
 + **Universidade:** Impacta
 
 ---
