@@ -1,0 +1,15 @@
+{
+  "summary": {
+    "severity": "High",
+    "decision": "Reject",
+    "categories": ["Cost"]
+  },
+  "findings": [
+    {
+      "category": "Cost",
+      "description": "Instância muito cara",
+      "suggested_action": "Trocar tipo",
+      "line_number": 10
+    }
+  ]
+}
