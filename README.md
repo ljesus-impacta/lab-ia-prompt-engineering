@@ -13,12 +13,15 @@
 
 ```plaintext
 .
-├── prompts/
-│   ├── v1-baseline.md       # Prompt Zero-shot (Generalista)
-│   ├── v2-structured.md     # Prompt com Persona e CoT (Organizado)
-│   └── v3-schema.md         # Prompt JSON/Anti-Injection (Robusto)
-├── resultados/
-│   ├── (Simulações de saída dos modelos)
+├── prompts/              # Seus arquivos .md com as versões dos prompts
+│   ├── v1-baseline.md
+│   ├── v2-structured.md
+│   └── v3-schema.md
+├── resultados/           # Os prints/logs dos testes
+│   ├── ...
+├── scripts/              # Os scripts python
+│   └── validate_pr.py
+├── llm_output.json       # Arquivo temporário gerado pela IA para teste (input do script)
 └── README.md
 ```
 
@@ -74,7 +77,14 @@ O objetivo central é sair de uma análise genérica e imprevisível para uma in
 
 ### Como utilizar
 
-1. **Selecione o prompt:** Copie o conteúdo do arquivo desejado na pasta `prompts/`.
-2. **Insira o código:** Substitua o placeholder de código pelo seu Terraform ou CloudFormation.
-3. **Execute:** Submeta ao seu LLM de preferência (GPT-4, Claude 3, etc.).
-4. **Automatize (v3):** Utilize um script para parsear o JSON de resposta e bloquear a pipeline em caso de erros críticos.
+1. **Selecione o prompt:** Escolha a versão desejada (v1, v2 ou v3) dentro da pasta `prompts/`.
+2. **Insira o código:** No arquivo escolhido, substitua o placeholder {{CODIGO_DO_PR}} pelo conteúdo do seu arquivo Terraform ou CloudFormation.
+3. **Execute:** Copie o prompt final e submeta ao seu LLM de preferência (GPT-4, Claude 3, Gemini, etc.).
+4. **Automatize (v3):** Para testar o bloqueio de pipeline:
+Salve a resposta JSON da IA em um arquivo chamado llm_output.json na raiz do projeto.
+Execute o script de validação para verificar se o PR seria aprovado ou rejeitado:
+
+## Bash
+```bash
+python scripts/validate_pr.py
+```
