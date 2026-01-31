@@ -1,6 +1,7 @@
 # 🛡️ IaC Auto-Reviewer: Code Review de Infraestrutura com IA
 
 + **Autor:** Luciano Souza de Jesus
++  **Email:** luciano.jesus@aluno.faculdadeimpacta.com.br
 + **MBA:** CLC14 Cloud Computing & DevOps
 + **Universidade:** Impacta
 
