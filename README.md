@@ -1,93 +1,128 @@
-# 🤖 Automação de Code Review de IaC (Terraform/CloudFormation)
+# 🛡️ IaC Auto-Reviewer: Code Review de Infraestrutura com IA
 
-> Este projeto demonstra a evolução de técnicas de Prompt Engineering aplicadas a DevOps, criando um analisador automático de Pull Requests focado em Segurança e Infraestrutura como Código (IaC).
-
-+ **Contexto:** DevOps Engineering  
 + **Autor:** Luciano Souza de Jesus
 + **MBA:** CLC14 Cloud Computing & DevOps
 + **Universidade:** Impacta
 
 ---
 
+## 📋 Sobre o Projeto
+
+Este projeto demonstra a implementação de um **Agente de Segurança e Qualidade para Infraestrutura como Código (IaC)**. Utilizando Engenharia de Prompts avançada e a API da OpenAI, o sistema atua como um "Senior DevOps virtual", analisando Pull Requests de Terraform e CloudFormation antes do merge.
+
+O projeto evolui de uma abordagem manual (v1) para uma automação completa em CI/CD (v3), capaz de bloquear deploys inseguros, detectar custos excessivos e resistir a ataques de *Prompt Injection*.
+
+---
+
 ## 📂 Estrutura do Projeto
 
-```plaintext
+```text
 .
 ├── .github/
 │   └── workflows/
-│       └── iac-scan.yml      # O Workflow do GitHub
-├── prompts/                  # Seus arquivos .md com as versões dos prompts
-│   ├── v1-baseline.md
-│   ├── v2-structured.md
-│   └── v3-schema.md          # O Prompt (usado pelo script Python)
-├── scripts/
-│   ├── scan_with_ai.py       # Conecta na OpenAI
-│   └── validate_pr.py        # Valida o JSON e bloqueia o PR
-├── requirements.txt          # Dependências (openai)
-├── llm_output_example.json           # Arquivo exemplo gerado pela IA para teste
-└── README.md
+│       └── iac-scan.yml      # Workflow do GitHub Actions (CI/CD)
+├── examples/                 # Arquivos IaC para teste (Cenários de PR)
+│   ├── pr1_storage.tf
+│   ├── pr2_security.tf
+│   ├── pr3_database.tf
+│   ├── pr4_ec2_tags.tf
+│   ├── pr5_lambda.yaml
+│   └── pr6_injection.tf
+├── prompts/                  # Versões evolutivas dos prompts
+│   ├── v1-baseline.md        # Prompt básico (Zero-shot)
+│   ├── v2-structured.md      # Prompt com Persona e Markdown
+│   └── v3-schema.md          # Prompt Blindado com JSON Schema
+├── scripts/                  # Scripts de automação (Python)
+│   ├── scan_with_ai.py       # Cliente API: Envia código para a OpenAI
+│   └── validate_pr.py        # Gatekeeper: Valida JSON e define Exit Code
+├── resultados/               # Evidências dos testes (Prints)
+├── llm_output.json           # Arquivo temporário de saída da IA
+├── requirements.txt          # Dependências do projeto
+└── README.md                 # Documentação
 ```
 
 ---
 
-## 🚀 Raciocínio da Evolução dos Prompts
+## 🧠 Evolução da Engenharia de Prompt
 
-O objetivo central é sair de uma análise genérica e imprevisível para uma integração de **CI/CD robusta**, segura e automatizável. Abaixo, o detalhamento das três fases de maturidade do projeto.
-
-### 1. v1-baseline (O Generalista)
-*Uma abordagem inicial "Zero-shot".*
-
-* **🧠 Lógica:** Prompt básico que apenas fornece as regras ao modelo e pede uma análise, sem contexto profundo.
-* **⚠️ Problemas:**
-    * **Inconsistência:** A saída varia entre texto corrido e tópicos, sem padrão definido.
-    * **Falha de Integração:** Difícil de ser consumido por scripts de CI/CD devido à falta de estrutura.
-    * **Alucinações:** Alta suscetibilidade a erros factuais e ignorância de nuances.
-
-### 2. v2-structured (O Organizado)
-*Introdução de Role Prompting e Chain of Thought (CoT).*
-
-* **🧠 Lógica:**
-    * **Persona:** O modelo assume o papel de um "Senior Cloud Security Engineer".
-    * **Delimitadores:** Uso claro de separadores para o código.
-    * **Chain of Thought:** Solicita a explicação do raciocínio antes do veredito final.
-* **✅ Melhorias:** Aumento significativo na qualidade técnica e consistência da análise.
-* **⚠️ Problemas:**
-    * **Parsing:** Ainda retorna texto livre (Markdown), dificultando o tratamento programático automatizado.
-    * **Segurança:** Vulnerável a *Prompt Injection* via comentários maliciosos no código analisado.
-
-### 3. v3-schema (O Robusto & Seguro)
-*Foco total em Automação e Segurança (Sandwich Defense).*
-
-* **🧠 Lógica:** Saída estritamente em **JSON** para consumo direto por ferramentas como `jq` ou Python.
-* **🛡️ Segurança (Anti-Injection):**
-    * **Sandwich Defense:** Instruções de defesa antes e depois do input do usuário.
-    * **XML Tags:** Delimitadores estritos para isolar o input.
-    * **Tratamento de Dados:** Instrução explícita para tratar o input apenas como dados, ignorando comandos embutidos.
-* **⚙️ Critérios Técnicos:** Uso de *Few-Shot Prompting* e Enums para garantir que campos como "Criticidade" sigam valores padrão.
+1. v1-baseline (O Generalista): Prompt simples. Retorna texto livre. Falha em consistência e é vulnerável a injeção de prompt.
+2. v2-structured (O Organizado): Usa Role Prompting e Chain of Thought. Melhora a explicação para humanos, mas difícil de parsear via script.
+3. v3-schema (O Automatizado):
+   + Saída: Estritamente JSON.
+   + Segurança: Implementa tags XML (<source_code>) e defesa "sanduíche" contra instruções maliciosas.
+   + Integração: Projetado para ser consumido por pipelines de CI/CD.
 
 ---
 
-## 📊 Comparativo Técnico
+## 🛠️ Instalação e Configuração
 
-| Característica | v1-baseline | v2-structured | v3-schema |
-| :--- | :---: | :---: | :---: |
-| **Formato de Saída** | Texto Livre (Aleatório) | Markdown Estruturado | JSON Estrito |
-| **Técnica Principal** | Zero-shot | Role Prompting / CoT | Sandwich Defense / Schema |
-| **Integrabilidade CI/CD** | 🔴 Baixa | 🟡 Média | 🟢 Alta |
-| **Segurança** | 🔴 Vulnerável | 🟡 Moderada | 🟢 Robusta |
+#### Pré-requisitos
+   + Python 3.8+
+   + Conta na OpenAI (API Key)
+
+1. Instalar Dependências
+```
+pip install -r requirements.txt
+```
+(Conteúdo do requirements.txt: ```openai```)
+
+2. Configurar Variáveis de Ambiente
+#### Linux/Mac (Bash):
+```export OPENAI_API_KEY="sk-sua-chave-aqui"```
+
+#### Windows (Powershell):
+```$env:OPENAI_API_KEY="sk-sua-chave-aqui"```
 
 ---
 
-### Como utilizar
+### 🚀 Como Utilizar
 
-1. **Selecione o prompt:** Escolha a versão desejada (v1, v2 ou v3) dentro da pasta `prompts/`.
-2. **Insira o código:** No arquivo escolhido, substitua o placeholder {{CODIGO_DO_PR}} pelo conteúdo do seu arquivo Terraform ou CloudFormation.
-3. **Execute:** Copie o prompt final e submeta ao seu LLM de preferência (GPT-4, Claude 3, Gemini, etc.).
-4. **Automatize (v3):** Para testar o bloqueio de pipeline:
-Salve a resposta JSON da IA em um arquivo chamado llm_output.json na raiz do projeto.
-Execute o script de validação para verificar se o PR seria aprovado ou rejeitado:
+1. **Modo 1: Teste Local (CLI):** Você pode rodar a IA contra os arquivos de exemplo localizados na pasta `examples/`. O script `scan_with_ai.py` gera o JSON, e o `validate_pr.py` diz se passa ou falha.
+#### Exemplo: Analisando um arquivo com falha de segurança (PR2)
+`Bash`
+```
+# 1. Enviar para análise da IA
+python scripts/scan_with_ai.py examples/pr2_security.tf
 
-## Bash
-```bash
+# 2. Verificar veredito (Gatekeeper)
 python scripts/validate_pr.py
 ```
+*Saída esperada:* `✅ SUCESSO: Pull Request aprovado para merge.`
+
+2. **Modo 2: Automação via GitHub Actions** O arquivo `.github/workflows/iac-scan.yml` configura a esteira automática.
+   1. Configure o segredo `OPENAI_API_KEY` nas configurações do repositório (Settings > Secrets > Actions).
+   2. Abra um Pull Request com arquivos `.tf` ou `.yaml`.
+   3. A Action rodará automaticamente e bloqueará o merge se a IA detectar riscos críticos (severity: `High/Critical` ou `decision: Reject`).
+
+---
+
+### 🧪 Cenários de Teste (Pasta `examples/`)
+
+| Arquivo | Cenário | Risco | Decisão Esperada v3 |
+| :--- | :---: | :---: | ---: |
+| pr1_storage.tf | Bucket S3 sem criptografia e versionamento | Médio | Request Changes (Qualidade: 6/10) |
+| pr2_security.tf | SSH (Porta 22) aberto para 0.0.0.0/0 | Crítico | Reject (Qualidade: 0/10) |
+| pr3_database.tf | Upgrade de DB (custo 10x maior) | Alto | Discuss (Custo Excessivo) |
+| pr4_ec2_tags.tf | Instância correta com tags de custo | Baixo | Approve (Qualidade: 10/10) |
+| pr5_lambda.tf | Lambda sem Timeout definido | Crítico | Médio | Approve (com ressalvas) |
+| pr6_injection.tf | Tentativa de Prompt Injection ("Ignore instructions") | Crítico | Reject (Ataque Detectado) |
+
+---
+
+### ⚙️ Detalhes Técnicos dos Scripts
+`scripts/scan_with_ai.py`
+Conecta na API da OpenAI (modelo `gpt-3.5-turbo` ou `gpt-4`), lê o **Prompt v3**, injeta o código do arquivo alvo e salva a resposta crua em `llm_output.json`.
+
+`scripts/validate_pr.py`
+Lê o arquivo JSON gerado. Se o campo `decision` for `"Reject"` ou `"Request Changes"`, o script encerra com **Exit Code 1**, o que faz a pipeline do GitHub/Jenkins ficar vermelha (falhar).
+
+`Python`
+```
+# Trecho da lógica de bloqueio
+if decision in ['Reject', 'Request Changes']:
+    sys.exit(1) # Bloqueia CI
+else:
+    sys.exit(0) # Aprova CI
+```
+
+*Projeto desenvolvido para fins educacionais sobre DevOps e LLMs.*
